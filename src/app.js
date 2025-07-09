@@ -4,6 +4,7 @@ const connectDB = require("./config/database");
 const User = require("./models/user");
 require('dotenv').config();
 
+
 app.use(express.json());
 
 app.get("/users", async (req, res) => {
