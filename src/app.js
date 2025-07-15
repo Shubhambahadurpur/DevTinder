@@ -9,12 +9,12 @@ const bcrypt = require('bcrypt');
 
 app.use(express.json());
 
-app.get("/users", async (req, res) => {
+app.get("/users", async (req, res) => { // get all user data
   const data = await User.find({});
   res.send(data);
 });
 
-app.get("/user", async (req, res) => {
+app.get("/user", async (req, res) => { // get by email id
   try {
     const { emailId } = req.query;
     const data = await User.findOne({ emailId: emailId });
@@ -49,7 +49,7 @@ app.post("/user", async (req, res) => { // create new user
   }
 });
 
-app.delete("/user", async (req, res) => {
+app.delete("/user", async (req, res) => { // delete user api
     try {
         const user = await User.findOne({ emailId: req?.body?.emailId });
         await User.findByIdAndDelete(user?._id)
@@ -59,7 +59,7 @@ app.delete("/user", async (req, res) => {
     }
 });
 
-app.patch("/user/:userId", async (req, res) => {
+app.patch("/user/:userId", async (req, res) => { // update user api
     const userId = req.params?.userId;
     const body = req?.body;
     try {
@@ -72,6 +72,21 @@ app.patch("/user/:userId", async (req, res) => {
         res.status(500).send("Internal Server Error " + err);
     }
 })
+
+app.post("/login", async (req, res) => {
+
+  const { emailId, password } = req?.body;
+  try {
+    const user = await User.findOne({ emailId: emailId });
+    if (!user) throw new Error("Invalid Credentials");
+    const isPasswordCorrect = await bcrypt.compare(password, user?.password);
+    if(!isPasswordCorrect) throw new Error("Invalid Credentials");
+    res.send("user found")
+  } catch (err) {
+    res.status(400).send("Error:" + err?.message);
+  }
+})
+
 
 connectDB()
   .then(() => {
