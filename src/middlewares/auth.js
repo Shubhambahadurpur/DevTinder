@@ -1,8 +1,25 @@
-const auth = (req, res, next) => {
-    // logic for auth middleware
-    // return res.status(200).send("Authentication successful");
-    console.log("Auth middleware called");
-    next();
-}
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const secretKey = process.env.AUTH_SECRET_KEY;
 
-module.exports = { auth };
+
+const userAuth = async (req, res, next) => {
+  try {
+    const { token } = req?.cookies;
+    if (!token) {
+      throw new Error("Invalid Token");
+    }
+    const decodedTokenData = await jwt.verify(token, secretKey);
+
+    const user = await User.findById(decodedTokenData?._id);
+    if (!user) {
+      throw new Error("User Not found");
+    }
+    req.user = user; 
+    next();
+  } catch (err) {
+    res.status(400).send("ERROR: " + err?.message);
+  }
+};
+
+module.exports = { userAuth };

@@ -5,9 +5,11 @@ const User = require("./models/user");
 require('dotenv').config();
 const { validateSignUpData } = require('./utils/validation')
 const bcrypt = require('bcrypt');
-
+const cookieParser = require("cookie-parser");
+const { userAuth } = require("./middlewares/auth");
 
 app.use(express.json());
+app.use(cookieParser());
 
 app.get("/users", async (req, res) => { // get all user data
   const data = await User.find({});
@@ -79,11 +81,25 @@ app.post("/login", async (req, res) => {
   try {
     const user = await User.findOne({ emailId: emailId });
     if (!user) throw new Error("Invalid Credentials");
-    const isPasswordCorrect = await bcrypt.compare(password, user?.password);
+    const isPasswordCorrect = await user.validatePassword(password);
     if(!isPasswordCorrect) throw new Error("Invalid Credentials");
+
+    const token = await user.getJWT();
+
+    res.cookie("token", token);
     res.send("user found")
   } catch (err) {
     res.status(400).send("Error:" + err?.message);
+  }
+})
+
+app.get('/profile', userAuth, async (req, res) => {
+  try {
+    console.log("reeeq", req.user)
+    const user = req.user;
+    res.send(user);
+  } catch (err) {
+    res.status(400).send("ERROR: "+ err?.message);
   }
 })
 
