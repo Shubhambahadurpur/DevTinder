@@ -10,6 +10,18 @@ const validateSignUpData = (req) => {
     throw new Error("Password is not strong");
 };
 
+const validateUpdateProfileData = (req) => {
+    const ALLOWED_FEILDS = ["about", "skills", "profilePhoto", "age"];
+    const IS_ALLOWED = Object.keys(req.body)?.every((element) =>
+      ALLOWED_FEILDS?.includes(element)
+    );
+    if (!IS_ALLOWED) {
+      throw new Error("Update not allowed.");
+    }
+    return true;
+}
+
 module.exports = {
   validateSignUpData,
+  validateUpdateProfileData
 };
