@@ -19,9 +19,17 @@ const validateUpdateProfileData = (req) => {
       throw new Error("Update not allowed.");
     }
     return true;
+};
+
+const validateConnectionStatus = (status) => {
+    const validConnectionRequestStatus = ["ignored", "interested"];
+    if (!validConnectionRequestStatus?.includes(status)) {
+      throw new Error("Invalid status");
+    }
 }
 
 module.exports = {
   validateSignUpData,
-  validateUpdateProfileData
+  validateUpdateProfileData,
+  validateConnectionStatus
 };
