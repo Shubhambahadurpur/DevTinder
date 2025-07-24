@@ -32,4 +32,32 @@ requestRouter.post('/send/:status/:userId', userAuth, async (req, res) => {
     }
 })
 
+requestRouter.post('/review/:status/:requestId', userAuth, async (req, res) => {
+    try {
+        const loggedInUser = req?.user;
+        const status = req?.params?.status;
+        const requestId = req?.params?.requestId;
+
+        const ALLOWED_USERS = ["accepted", "rejected"];
+        if (!ALLOWED_USERS?.includes(status)) {
+            throw new Error("Status not allowed");
+        }
+
+        const connectionRequest = await ConnectionRequest.findOne({
+            _id: requestId,
+            toUserId: loggedInUser?._id,
+            status: "interested",
+        })
+
+        if (!connectionRequest) {
+            throw new Error("Connection Request Not Found");
+        }
+        connectionRequest.status = status;
+        const data = await connectionRequest.save();
+        res.json({ message: "Connection Request Updated", data })
+    } catch (err) {
+        res.status(400).send("ERROR: " + err.message);
+    }
+})
+
 module.exports = requestRouter;
