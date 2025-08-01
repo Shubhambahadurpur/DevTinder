@@ -68,7 +68,7 @@ authRouter.patch("/password", userAuth, async (req, res) => {
     const encryptPassword = await bcrypt.hash(newPassword, 10);
     await User.findByIdAndUpdate(user?._id, { password: encryptPassword }, { runValidators: true });
     res.cookie("token", null, { expires: new Date(Date.now())});
-    res.send("hello")
+    res.send("Password Updated")
   } catch (err) {
     res.status(400).send("ERROR: "+ err.message)
   }
