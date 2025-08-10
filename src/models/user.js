@@ -12,7 +12,8 @@ const userSchema = mongoose.Schema({
     maxLength: [50, "Too long name"]
   },
   lastName: { 
-    type: String 
+    type: String,
+    required: true
   },
   emailId: { 
     type: String,
@@ -69,7 +70,7 @@ const userSchema = mongoose.Schema({
 
 userSchema.methods.getJWT = async function () {
   const user = this;
-  const token = await jwt.sign({ _id: user?._id }, process.env.AUTH_SECRET_KEY, { expiresIn: '1hr'})
+  const token = await jwt.sign({ _id: user?._id }, process.env.AUTH_SECRET_KEY, { expiresIn: '24hr'})
   return token;
 }
 

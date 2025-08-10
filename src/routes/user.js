@@ -3,7 +3,7 @@ const { userAuth } = require('../middlewares/auth');
 const ConnectionRequest = require('../models/connectionRequest');
 const User = require('../models/user');
 const userRouter = express.Router();
-const USER_DATA = ["firstName", "lastName", "age", "skills", "gender", "profilePhoto"];
+const USER_DATA = ["firstName", "lastName", "age", "skills", "gender", "profilePhoto", "about"];
 
 userRouter.get('/requests/received', userAuth, async (req, res) => {
     try {
@@ -50,9 +50,9 @@ userRouter.get('/feed', userAuth, async (req, res) => {
 
 
         const SKIP = (pageNo - 1) * pageSize;
-        const connectionRequests = await ConnectionRequest.find({}).select(["fromUserId", "toUserId"]);
+        const connectionRequests = await ConnectionRequest.find({ $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }]}).select(["fromUserId", "toUserId"]);
         const hideUsers = new Set();
-
+        
         connectionRequests.forEach(request => {
             hideUsers.add(request?.fromUserId);
             hideUsers.add(request?.toUserId);
